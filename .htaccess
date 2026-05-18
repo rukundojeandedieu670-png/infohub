@@ -1,0 +1,39 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /infohub/
+    
+    # Remove trailing slashes (except for directories)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ $1 [L,R=301]
+    
+    # Route all requests through index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Prevent access to sensitive files (Apache 2.4 syntax)
+<FilesMatch "\.env|\.git|\.gitignore|database\.sql">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Enable gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+# Cache control for static files (if mod_headers is available)
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|pdf|css|js)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+</IfModule>

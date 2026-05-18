@@ -1,0 +1,180 @@
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Executing: Controller=AuthController, Method=logout
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+Method exists: yes
+Calling method...
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Executing: Controller=AuthController, Method=logout
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+About to instantiate HomeController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Executing: Controller=AuthController, Method=logout
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+About to instantiate HomeController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+About to instantiate HomeController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Executing: Controller=AuthController, Method=logout
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+About to instantiate HomeController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/auth/register
+Processed: auth/register
+Method: GET
+
+MATCHED: auth/register => AuthController@register
+Executing: Controller=AuthController, Method=register
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/auth/login
+Processed: auth/login
+Method: GET
+
+MATCHED: auth/login => AuthController@login
+Executing: Controller=AuthController, Method=login
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/auth/logout
+Processed: auth/logout
+Method: GET
+
+MATCHED: auth/logout => AuthController@logout
+Executing: Controller=AuthController, Method=logout
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/AuthController.php
+Exists: yes
+Controller class: AuthController
+Class exists: yes
+About to instantiate AuthController
+Instantiated successfully
+Method exists: yes
+Calling method...
+Original: /infohub/
+Processed: 
+Method: GET
+
+MATCHED:  => HomeController@index
+Executing: Controller=HomeController, Method=index
+Controller file: C:\wamp64\www\infohub\core/../app/controllers/HomeController.php
+Exists: yes
+Controller class: HomeController
+Class exists: yes
+About to instantiate HomeController
+Instantiated successfully
+Method exists: yes
+Calling method...

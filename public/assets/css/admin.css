@@ -1,0 +1,132 @@
+/**
+ * Admin Dashboard Styles
+ */
+
+.admin-navbar {
+    background: linear-gradient(135deg, #16a34a, #2563eb);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-navbar a {
+    color: white;
+    transition: var(--transition);
+}
+
+.admin-navbar a:hover {
+    color: #fcd34d;
+    text-decoration: none;
+}
+
+.admin-sidebar {
+    background: var(--bg-gray);
+    border-right: 1px solid var(--border);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.admin-sidebar-item {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-primary);
+    transition: var(--transition);
+    border-left: 4px solid transparent;
+}
+
+.admin-sidebar-item:hover {
+    background-color: var(--bg-light);
+    border-left-color: var(--primary);
+    text-decoration: none;
+}
+
+.admin-sidebar-item.active {
+    background-color: white;
+    border-left-color: var(--primary);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.stat-card h3 {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.admin-table thead {
+    background: var(--bg-gray);
+    border-bottom: 2px solid var(--border);
+}
+
+.admin-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-table tbody tr:hover {
+    background-color: var(--bg-light);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-success {
+    background-color: #ecfdf5;
+    color: var(--success);
+}
+
+.status-danger {
+    background-color: #fef2f2;
+    color: var(--danger);
+}
+
+.status-warning {
+    background-color: #fffbeb;
+    color: var(--warning);
+}
+
+.status-info {
+    background-color: #eff6ff;
+    color: var(--info);
+}
