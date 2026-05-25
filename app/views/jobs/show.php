@@ -13,8 +13,14 @@ ob_start();
                 <span class="salary-badge">⭐ Featured</span>
             <?php endif; ?>
         </div>
+        <?php
+            $employerName = trim(($job['first_name'] ?? '') . ' ' . ($job['last_name'] ?? ''));
+            if (empty($employerName)) {
+                $employerName = $job['company_name'] ?? 'Employer';
+            }
+        ?>
         <div class="detail-meta">
-            <span>🏢 <?php echo htmlspecialchars($job['first_name'] . ' ' . $job['last_name']); ?></span>
+            <span>🏢 <?php echo htmlspecialchars($employerName); ?></span>
             <span>📍 <?php echo htmlspecialchars($job['location']); ?></span>
             <span><?php echo ucfirst(str_replace('-', ' ', $job['job_type'])); ?></span>
             <span><?php echo htmlspecialchars($job['category_name'] ?? 'General'); ?></span>
@@ -37,7 +43,7 @@ ob_start();
         <div class="detail-section">
             <h3>Requirements</h3>
             <ul class="job-requirements">
-                <?php foreach (explode('\n', $job['requirements']) as $req): ?>
+                <?php foreach (explode("\n", $job['requirements']) as $req): ?>
                     <?php if (trim($req)): ?>
                         <li><?php echo htmlspecialchars(trim($req)); ?></li>
                     <?php endif; ?>
@@ -50,7 +56,7 @@ ob_start();
         <div class="detail-section">
             <h3>Benefits</h3>
             <ul class="job-benefits">
-                <?php foreach (explode('\n', $job['benefits']) as $benefit): ?>
+                <?php foreach (explode("\n", $job['benefits']) as $benefit): ?>
                     <?php if (trim($benefit)): ?>
                         <li><?php echo htmlspecialchars(trim($benefit)); ?></li>
                     <?php endif; ?>
