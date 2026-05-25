@@ -338,6 +338,8 @@ git push --force-with-lease rukundo main
 
 > If GitHub blocks the push, ensure `.env` is removed from all commit history and that you have completed browser authentication.
 
+See `CONTRIBUTING.md` for development rules, secret handling, and push guidance.
+
 ---
 
 # 🧠 FINAL RULE FOR COPILOT
