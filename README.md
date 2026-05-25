@@ -296,6 +296,50 @@ This Phase 1 system is designed for:
 
 ---
 
+# 🚀 Getting Started
+
+## Local setup
+
+1. Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+2. Update `.env` with your local values:
+
+```ini
+APP_URL=http://localhost/infohub
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+3. Start your local web server and database.
+
+4. Open the app in your browser at:
+
+```text
+http://localhost/infohub
+```
+
+## Git safety
+
+* Never commit `.env`.
+* Keep real credentials out of version control.
+* Use `.env.example` as the safe template.
+
+## Push guidance after cleanup
+
+If you rewrite history to remove secrets, push with:
+
+```bash
+git push --force-with-lease rukundo main
+```
+
+> If GitHub blocks the push, ensure `.env` is removed from all commit history and that you have completed browser authentication.
+
+---
+
 # 🧠 FINAL RULE FOR COPILOT
 
 👉 ALWAYS generate UI using:
