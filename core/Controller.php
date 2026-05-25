@@ -8,6 +8,7 @@ class Controller {
     protected $db;
     protected $user = null;
     protected $isAdmin = false;
+    protected $currentRole = null;
 
     public function __construct() {
         $this->db = Database::getInstance();
@@ -23,12 +24,46 @@ class Controller {
                 'id' => $_SESSION['user_id'],
                 'email' => $_SESSION['user_email'],
                 'role' => $_SESSION['user_role'],
+                'role_id' => $_SESSION['user_role_id'] ?? null,
                 'first_name' => $_SESSION['user_first_name'] ?? 'User',
                 'last_name' => $_SESSION['user_last_name'] ?? ''
             ];
-            
-            $this->isAdmin = in_array($_SESSION['user_role'], ['Super Admin', 'Admin', 'Editor']);
+
+            $currentRole = $this->getCurrentRoleRecord();
+            if ($currentRole) {
+                require_once ROOT_PATH . '/app/models/Role.php';
+                $roleModel = new Role();
+                $this->isAdmin = $roleModel->canActAs($currentRole['id'], 'Admin');
+            } else {
+                $this->isAdmin = in_array($this->user['role'], ['Super Admin', 'Admin', 'Editor']);
+            }
         }
+    }
+
+    /**
+     * Get the current active role record for the signed-in user.
+     */
+    protected function getCurrentRoleRecord() {
+        if ($this->currentRole !== null) {
+            return $this->currentRole;
+        }
+
+        if (!$this->user) {
+            return null;
+        }
+
+        require_once ROOT_PATH . '/app/models/Role.php';
+        $roleModel = new Role();
+
+        if (!empty($this->user['role_id'])) {
+            $this->currentRole = $roleModel->findById((int)$this->user['role_id']);
+        }
+
+        if (empty($this->currentRole) && !empty($this->user['role'])) {
+            $this->currentRole = $roleModel->getByName($this->user['role']);
+        }
+
+        return $this->currentRole;
     }
 
     /**
@@ -44,9 +79,27 @@ class Controller {
      */
     protected function requireLogin() {
         if (!$this->user) {
+            $_SESSION['redirect_after_login'] = $this->getRelativeRequestPath();
             header('Location: ' . APP_URL . '/auth/login');
             exit;
         }
+    }
+
+    /**
+     * Get the current request path relative to the application base URL
+     */
+    protected function getRelativeRequestPath() {
+        $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+        $appPath = parse_url(APP_URL, PHP_URL_PATH) ?: '';
+
+        if ($appPath !== '' && strpos($requestUri, $appPath) === 0) {
+            $requestUri = substr($requestUri, strlen($appPath));
+            if ($requestUri === '') {
+                $requestUri = '/';
+            }
+        }
+
+        return $requestUri;
     }
 
     /**
@@ -54,7 +107,12 @@ class Controller {
      */
     protected function requireAdmin() {
         $this->requireLogin();
-        if (!$this->isAdmin) {
+
+        require_once ROOT_PATH . '/app/models/Role.php';
+        $roleModel = new Role();
+        $currentRole = $this->getCurrentRoleRecord();
+
+        if (!$currentRole || !$roleModel->canActAs($currentRole['id'], 'Admin')) {
             http_response_code(403);
             $this->view('errors/403');
             exit;
@@ -66,11 +124,22 @@ class Controller {
      */
     protected function requireRole($role) {
         $this->requireLogin();
-        if ($this->user['role'] !== $role) {
-            http_response_code(403);
-            $this->view('errors/403');
-            exit;
+
+        require_once ROOT_PATH . '/app/models/Role.php';
+        $roleModel = new Role();
+        $currentRole = $this->getCurrentRoleRecord();
+
+        if ($currentRole && $roleModel->canActAs($currentRole['id'], $role)) {
+            return;
         }
+
+        if ($this->user['role'] === $role) {
+            return;
+        }
+
+        http_response_code(403);
+        $this->view('errors/403');
+        exit;
     }
 
     /**
@@ -174,11 +243,27 @@ class Controller {
             return false;
         }
 
+        $roleRecord = $this->getCurrentRoleRecord();
+
+        if ($roleRecord) {
+            require_once ROOT_PATH . '/app/models/Role.php';
+            $roleModel = new Role();
+            $permissions = $roleModel->getEffectivePermissions($roleRecord['id']);
+
+            foreach ($permissions as $permission) {
+                if ($roleModel->permissionMatchesAction($permission, $action)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         $role = $this->user['role'];
         
-        // Permission matrix based on roles
+        // Fallback permission matrix based on roles
         $permissions = [
-            'Super Admin' => ['*'],  // Full access
+            'Super Admin' => ['*'],
             'Admin' => ['users.manage', 'content.manage', 'businesses.manage', 'jobs.manage', 'profile.edit', 'profile.view'],
             'Editor' => ['posts.create', 'posts.edit_own', 'posts.delete_own', 'comments.manage', 'profile.edit', 'profile.view'],
             'Writer' => ['posts.create', 'posts.edit_own', 'posts.delete_own', 'profile.edit', 'profile.view'],
@@ -187,19 +272,16 @@ class Controller {
             'Registered User' => ['profile.edit', 'profile.view', 'comments.create', 'bookmarks.create']
         ];
 
-        // Check if role exists in permissions
         if (!isset($permissions[$role])) {
             return false;
         }
 
         $rolePermissions = $permissions[$role];
 
-        // Super Admin has all permissions
         if (in_array('*', $rolePermissions)) {
             return true;
         }
 
-        // Check if action is in role permissions
         return in_array($action, $rolePermissions);
     }
 
@@ -231,7 +313,7 @@ class Controller {
      */
     protected function canManageUsers() {
         $this->requireLogin();
-        return in_array($this->user['role'], ['Super Admin', 'Admin']);
+        return $this->hasPermission('users.manage');
     }
 
     /**

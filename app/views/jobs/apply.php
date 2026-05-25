@@ -2,8 +2,9 @@
 // Job application form view
 $title = "Apply for Job - " . htmlspecialchars($job['title']);
 $description = "Submit your application for " . htmlspecialchars($job['title']);
-include ROOT_PATH . '/app/views/layouts/main.php';
 $employmentType = $job['job_type'] ?? $job['employment_type'] ?? null;
+
+ob_start();
 ?>
 
 <div class="container mt-5 mb-5 apply-page">
@@ -288,3 +289,8 @@ $employmentType = $job['job_type'] ?? $job['employment_type'] ?? null;
         }, 5000);
     });
 </script>
+
+<?php
+$content = ob_get_clean();
+include ROOT_PATH . '/app/views/layouts/main.php';
+?>

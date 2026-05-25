@@ -13,7 +13,7 @@ class Job extends Model {
      */
     public function getOpenJobs($limit = 10, $offset = 0) {
         $this->db->prepare("
-            SELECT j.*, u.first_name, u.last_name, c.name as category_name
+            SELECT j.*, u.company AS company_name, c.name as category_name
             FROM {$this->table} j
             LEFT JOIN users u ON j.employer_id = u.id
             LEFT JOIN categories c ON j.category_id = c.id
@@ -32,7 +32,7 @@ class Job extends Model {
      */
     public function getBySlug($slug) {
         $this->db->prepare("
-            SELECT j.*, u.first_name, u.last_name, u.email, u.phone, c.name as category_name
+            SELECT j.*, u.company AS company_name, u.email, u.phone, c.name as category_name
             FROM {$this->table} j
             LEFT JOIN users u ON j.employer_id = u.id
             LEFT JOIN categories c ON j.category_id = c.id
@@ -80,7 +80,6 @@ class Job extends Model {
             'title' => $data['title'],
             'slug' => $slug,
             'description' => $data['description'],
-            'company_name' => $data['company_name'],
             'employer_id' => $data['employer_id'],
             'category_id' => $data['category_id'],
             'location' => $data['location'],
@@ -100,33 +99,37 @@ class Job extends Model {
      */
     public function search($keyword, $categoryId = null, $jobType = null, $limit = 10, $offset = 0) {
         $query = "
-            SELECT j.*, c.name as category_name
+            SELECT j.*, u.company AS company_name, c.name as category_name
             FROM {$this->table} j
+            LEFT JOIN users u ON j.employer_id = u.id
             LEFT JOIN categories c ON j.category_id = c.id
             WHERE j.status = 'open' AND j.deadline > NOW()
-            AND (j.title LIKE ? OR j.description LIKE ? OR j.company_name LIKE ?)
+            AND (j.title LIKE ? OR j.description LIKE ? OR u.company LIKE ?)
         ";
 
         $searchTerm = '%' . $keyword . '%';
-        $this->db->prepare($query);
-        $this->db->bind('s', $searchTerm);
-        $this->db->bind('s', $searchTerm);
-        $this->db->bind('s', $searchTerm);
+        $params = [$searchTerm, $searchTerm, $searchTerm];
+        $types = 'sss';
 
         if ($categoryId) {
             $query .= " AND j.category_id = ?";
-            $this->db->bind('i', $categoryId);
+            $types .= 'i';
+            $params[] = $categoryId;
         }
 
         if ($jobType) {
             $query .= " AND j.job_type = ?";
-            $this->db->bind('s', $jobType);
+            $types .= 's';
+            $params[] = $jobType;
         }
 
-        $query .= " ORDER BY j.featured DESC, j.published_at DESC LIMIT ? OFFSET ?";
-        $this->db->bind('i', $limit);
-        $this->db->bind('i', $offset);
+        $query .= " ORDER BY j.is_featured DESC, j.published_at DESC LIMIT ? OFFSET ?";
+        $types .= 'ii';
+        $params[] = $limit;
+        $params[] = $offset;
 
+        $this->db->prepare($query);
+        $this->db->bindArray($types, $params);
         $this->db->execute();
         return $this->db->resultSet();
     }

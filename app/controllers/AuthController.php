@@ -80,6 +80,7 @@ class AuthController extends Controller {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role_name'];
+        $_SESSION['user_role_id'] = $user['role_id'] ?? null;
         $_SESSION['user_first_name'] = $user['first_name'];
         $_SESSION['user_last_name'] = $user['last_name'];
 
@@ -88,6 +89,20 @@ class AuthController extends Controller {
         Logger::logActivity($user['id'], 'login', 'auth', 'User logged in');
 
         $this->setFlash('success', 'Welcome back!');
+
+        $redirectAfterLogin = $_SESSION['redirect_after_login'] ?? null;
+        unset($_SESSION['redirect_after_login']);
+
+        if ($redirectAfterLogin) {
+            if (strpos($redirectAfterLogin, APP_URL) === 0) {
+                $this->redirect($redirectAfterLogin);
+            }
+
+            if (strpos($redirectAfterLogin, '/') === 0) {
+                $this->redirect(APP_URL . $redirectAfterLogin);
+            }
+        }
+
         $this->redirect(APP_URL);
     }
 
@@ -494,6 +509,7 @@ class AuthController extends Controller {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role_name'];
+                $_SESSION['user_role_id'] = $user['role_id'] ?? null;
                 $_SESSION['user_first_name'] = $user['first_name'];
                 $_SESSION['user_last_name'] = $user['last_name'];
 
@@ -528,6 +544,7 @@ class AuthController extends Controller {
                 $_SESSION['user_id'] = $newUserId;
                 $_SESSION['user_email'] = $email;
                 $_SESSION['user_role'] = 'Registered User';
+                $_SESSION['user_role_id'] = $role_id;
                 $_SESSION['user_first_name'] = $firstName;
                 $_SESSION['user_last_name'] = $lastName;
 

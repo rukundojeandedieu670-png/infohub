@@ -13,6 +13,8 @@
     <meta name="description" content="Rwanda's news, jobs, scholarships, and business opportunities">
     <meta property="og:title" content="InfoHub News">
     <meta property="og:description" content="Rwanda's trusted digital platform for news and opportunities">
+    <link rel="icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg">
     <title><?php echo htmlspecialchars($page_title ?? 'News & Opportunities | InfoHub'); ?></title>
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/public/assets/css/style.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/public/assets/css/news-modern.css">

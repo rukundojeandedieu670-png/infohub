@@ -19,18 +19,49 @@ class JobsController extends Controller {
         // Get search parameters
         $search = $this->sanitize($_GET['search'] ?? '');
         $category = $_GET['category'] ?? null;
-        $type = $_GET['type'] ?? null;
+        $type = $this->sanitize($_GET['type'] ?? '');
+        $allowedTypes = ['full-time', 'part-time', 'contract', 'temporary', 'internship'];
+        $type = in_array($type, $allowedTypes) ? $type : null;
 
         if ($search || $category || $type) {
             $jobs = $jobModel->search($search, $category, $type, $limit, $offset);
         }
 
+        $userApplications = [];
+        if ($this->user) {
+            $this->db->prepare(
+                "SELECT a.*, j.title, j.slug, u.company AS company_name, j.location FROM job_applications a JOIN jobs j ON a.job_id = j.id LEFT JOIN users u ON j.employer_id = u.id WHERE a.applicant_id = ? ORDER BY a.applied_at DESC"
+            );
+            $applicantId = $this->user['id'];
+            $this->db->bind('i', $applicantId);
+            $this->db->execute();
+            $userApplications = $this->db->resultSet();
+        }
+
+        $pageTitle = 'Jobs | InfoHub';
+        if ($type) {
+            $pageTitle = ucfirst(str_replace('-', ' ', $type)) . ' | InfoHub';
+        }
+
+        // Build a human-friendly vacancies message after evaluating search/type
+        $vacanciesMessage = 'Explore available vacancies and internships below.';
+        if (!empty($type)) {
+            $vacanciesMessage = 'Showing ' . ucfirst(str_replace('-', ' ', $type)) . ' vacancies.';
+        }
+        if (!empty($search)) {
+            $vacanciesMessage = 'Search results for "' . htmlspecialchars($search) . '"';
+        }
+
         $this->view('jobs/index', [
             'jobs' => $jobs,
+            'userApplications' => $userApplications,
             'page' => $page,
             'totalPages' => $totalPages,
             'search' => $search,
-            'page_title' => 'Jobs | InfoHub',
+            'type' => $type,
+            'totalJobs' => $totalJobs,
+            'vacanciesMessage' => $vacanciesMessage,
+            'page_title' => $pageTitle,
             'flash' => $this->getFlash(),
             'user' => $this->user
         ]);
@@ -51,12 +82,13 @@ class JobsController extends Controller {
         // Check if user applied
         $userApplied = false;
         if ($this->user) {
-            $this->db->prepare("
-                SELECT id FROM job_applications 
-                WHERE job_id = ? AND applicant_id = ?
-            ");
-            $this->db->bind('i', $job['id']);
-            $this->db->bind('i', $this->user['id']);
+            $this->db->prepare(
+                "SELECT id FROM job_applications WHERE job_id = ? AND applicant_id = ?"
+            );
+            $jobId = $job['id'];
+            $userId = $this->user['id'];
+            $this->db->bind('i', $jobId);
+            $this->db->bind('i', $userId);
             $this->db->execute();
             $userApplied = $this->db->single() !== null;
 
@@ -91,6 +123,13 @@ class JobsController extends Controller {
     }
 
     public function apply() {
+        // Log incoming apply attempt for debugging
+        try {
+            Logger::logActivity($_SESSION['user_id'] ?? null, 'apply_attempt', 'jobs', json_encode(['method' => $_SERVER['REQUEST_METHOD'], 'job_id' => $_POST['job_id'] ?? null]));
+        } catch (Exception $e) {
+            error_log('Logger failed: ' . $e->getMessage());
+        }
+
         $this->requireLogin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -121,12 +160,12 @@ class JobsController extends Controller {
         // Check already applied
         require_once ROOT_PATH . '/core/Database.php';
         $db = Database::getInstance();
-        $db->prepare("
-            SELECT id FROM job_applications 
-            WHERE job_id = ? AND applicant_id = ?
-        ");
+        $db->prepare(
+            "SELECT id FROM job_applications WHERE job_id = ? AND applicant_id = ?"
+        );
+        $applicantId = $_SESSION['user_id'] ?? null;
         $db->bind('i', $id);
-        $db->bind('i', $_SESSION['user_id']);
+        $db->bind('i', $applicantId);
         $db->execute();
 
         if ($db->single()) {
@@ -159,7 +198,7 @@ class JobsController extends Controller {
             }
 
             $fileName = time() . '_' . bin2hex(random_bytes(4)) . '.' . pathinfo($_FILES['cv_file']['name'], PATHINFO_EXTENSION);
-            
+
             if (move_uploaded_file($_FILES['cv_file']['tmp_name'], $uploadDir . $fileName)) {
                 $cvPath = '/uploads/cvs/' . $fileName;
             }
@@ -167,20 +206,20 @@ class JobsController extends Controller {
 
         // Create application
         $coverLetter = htmlspecialchars($_POST['cover_letter'] ?? '');
-        
+
         try {
-            $db->prepare("
-                INSERT INTO job_applications (job_id, applicant_id, cv_path, cover_letter, status, applied_at) 
-                VALUES (?, ?, ?, ?, ?, NOW())
-            ");
+            $db->prepare(
+                "INSERT INTO job_applications (job_id, applicant_id, cv_path, cover_letter, status, applied_at) VALUES (?, ?, ?, ?, ?, NOW())"
+            );
             $db->bind('i', $id);
-            $db->bind('i', $_SESSION['user_id']);
+            $db->bind('i', $applicantId);
             $db->bind('s', $cvPath);
             $db->bind('s', $coverLetter);
-            $db->bind('s', 'pending');
+            $status = 'pending';
+            $db->bind('s', $status);
             $db->execute();
 
-            Logger::logActivity($_SESSION['user_id'], 'apply_job', 'jobs', json_encode([
+            Logger::logActivity($applicantId, 'apply_job', 'jobs', json_encode([
                 'job_id' => $id,
                 'job_title' => $job['title']
             ]));

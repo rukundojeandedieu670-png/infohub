@@ -19,18 +19,20 @@ CREATE TABLE IF NOT EXISTS roles (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,
   description TEXT,
+  parent_id INT UNSIGNED DEFAULT NULL,
   permissions JSON,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (parent_id) REFERENCES roles(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default roles
-INSERT INTO roles (name, description) VALUES
-  ('Super Admin', 'Full system access'),
-  ('Admin', 'Administrator access'),
-  ('Editor', 'Content editor'),
-  ('Employer', 'Job employer'),
-  ('Business', 'Business owner'),
-  ('User', 'Regular user');
+INSERT INTO roles (name, description, parent_id, permissions) VALUES
+  ('Super Admin', 'Full system access', NULL, '["*"]'),
+  ('Admin', 'Administrator access', 1, '["users.manage", "content.manage", "businesses.manage", "jobs.manage", "profile.edit", "profile.view"]'),
+  ('Editor', 'Content editor', 2, '["posts", "comments", "profile.edit", "profile.view"]'),
+  ('Employer', 'Job employer', 2, '["jobs.create", "jobs.edit_own", "jobs.delete_own", "applications.view", "profile.edit", "profile.view"]'),
+  ('Business', 'Business owner', 2, '["businesses.create", "businesses.edit_own", "businesses.delete_own", "profile.edit", "profile.view"]'),
+  ('User', 'Regular user', NULL, '["comments.create", "bookmarks.create", "profile.edit", "profile.view"]');
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
@@ -67,10 +69,15 @@ CREATE TABLE IF NOT EXISTS categories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_slug (slug),
-  INDEX idx_is_active (is_active)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+  currency VARCHAR(3) DEFAULT 'RWF',
+  location VARCHAR(255),
+  is_remote BOOLEAN DEFAULT FALSE,
+  job_type ENUM('full-time', 'part-time', 'contract', 'temporary', 'internship') DEFAULT 'full-time',
+  experience_level ENUM('entry', 'mid', 'senior', 'executive') DEFAULT 'mid',
+  status ENUM('open', 'closed', 'on-hold', 'filled') DEFAULT 'open',
+  is_featured BOOLEAN DEFAULT FALSE,
 -- Posts/News Table
+  views_count INT DEFAULT 0,
 CREATE TABLE IF NOT EXISTS posts (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -79,7 +86,10 @@ CREATE TABLE IF NOT EXISTS posts (
   content LONGTEXT NOT NULL,
   author_id INT UNSIGNED NOT NULL,
   category_id INT UNSIGNED,
-  featured_image VARCHAR(255),
+  INDEX idx_featured (is_featured),
+  INDEX idx_employer_id (employer_id),
+  INDEX idx_deadline (deadline),
+  FULLTEXT INDEX idx_job_search (title, description, requirements)
   status ENUM('draft', 'published', 'archived') DEFAULT 'draft',
   is_featured BOOLEAN DEFAULT FALSE,
   views_count INT DEFAULT 0,
@@ -102,15 +112,20 @@ CREATE TABLE IF NOT EXISTS jobs (
   slug VARCHAR(255) NOT NULL UNIQUE,
   description LONGTEXT NOT NULL,
   requirements LONGTEXT,
+  benefits TEXT,
   employer_id INT UNSIGNED NOT NULL,
   category_id INT UNSIGNED,
   salary_min DECIMAL(10, 2),
   salary_max DECIMAL(10, 2),
+  currency VARCHAR(3) DEFAULT 'RWF',
   location VARCHAR(255),
-  job_type ENUM('full-time', 'part-time', 'contract', 'temporary') DEFAULT 'full-time',
-  status ENUM('open', 'closed', 'on-hold') DEFAULT 'open',
-  featured BOOLEAN DEFAULT FALSE,
+  is_remote BOOLEAN DEFAULT FALSE,
+  job_type ENUM('full-time', 'part-time', 'contract', 'temporary', 'internship') DEFAULT 'full-time',
+  experience_level ENUM('entry', 'mid', 'senior', 'executive') DEFAULT 'mid',
+  status ENUM('open', 'closed', 'on-hold', 'filled') DEFAULT 'open',
+  is_featured BOOLEAN DEFAULT FALSE,
   application_count INT DEFAULT 0,
+  views_count INT DEFAULT 0,
   published_at TIMESTAMP NULL,
   deadline TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -119,7 +134,10 @@ CREATE TABLE IF NOT EXISTS jobs (
   FOREIGN KEY (category_id) REFERENCES categories(id),
   INDEX idx_slug (slug),
   INDEX idx_status (status),
+  INDEX idx_featured (is_featured),
   INDEX idx_employer_id (employer_id),
+  INDEX idx_deadline (deadline),
+  FULLTEXT INDEX idx_job_search (title, description, requirements),
   INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

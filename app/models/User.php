@@ -20,7 +20,7 @@ class User extends Model {
      */
     public function findByEmailWithRole($email) {
         $this->db->prepare("
-            SELECT u.*, r.name as role_name 
+            SELECT u.*, r.id as role_id, r.name as role_name 
             FROM {$this->table} u 
             LEFT JOIN roles r ON u.role_id = r.id 
             WHERE u.email = ?
@@ -58,15 +58,28 @@ class User extends Model {
      * Create new user
      */
     public function createUser($data) {
+        $roleId = $data['role_id'] ?? $this->getRoleIdByName('Registered User');
+
         return $this->insert([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password_hash' => $data['password_hash'],
-            'role_id' => $data['role_id'] ?? 6, // Default to User role
+            'role_id' => $roleId,
             'is_active' => true
         ]);
+    }
+
+    /**
+     * Get role id by role name.
+     */
+    protected function getRoleIdByName($roleName) {
+        $this->db->prepare("SELECT id FROM roles WHERE name = ? LIMIT 1");
+        $this->db->bind('s', $roleName);
+        $this->db->execute();
+        $result = $this->db->single();
+        return $result['id'] ?? null;
     }
 
     /**

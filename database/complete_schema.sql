@@ -39,18 +39,20 @@ CREATE TABLE IF NOT EXISTS roles (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,
   description TEXT,
+  parent_id INT UNSIGNED DEFAULT NULL,
   permissions JSON,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (parent_id) REFERENCES roles(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO roles (name, description, permissions) VALUES
-  ('Super Admin', 'Full system access', '["*"]'),
-  ('Admin', 'Administrator access', '["users", "content", "businesses", "jobs", "payments", "reports"]'),
-  ('Editor', 'Content editor and publisher', '["posts", "categories", "comments"]'),
-  ('Writer', 'Creates articles and updates', '["posts.create", "posts.edit_own"]'),
-  ('Business Owner', 'Manages business listings', '["businesses.edit_own", "services"]'),
-  ('Employer', 'Posts and manages jobs', '["jobs.create", "jobs.edit_own", "applications"]'),
-  ('Registered User', 'Basic user interactions', '["comments", "bookmarks", "profiles"]');
+INSERT INTO roles (name, description, parent_id, permissions) VALUES
+  ('Super Admin', 'Full system access', NULL, '["*"]'),
+  ('Admin', 'Administrator access', 1, '["users.manage", "content.manage", "businesses.manage", "jobs.manage", "payments", "reports"]'),
+  ('Editor', 'Content editor and publisher', 2, '["posts", "categories", "comments"]'),
+  ('Writer', 'Creates articles and updates', 3, '["posts.create", "posts.edit_own"]'),
+  ('Business Owner', 'Manages business listings', 2, '["businesses.edit_own", "services"]'),
+  ('Employer', 'Posts and manages jobs', 2, '["jobs.create", "jobs.edit_own", "applications"]'),
+  ('Registered User', 'Basic user interactions', NULL, '["comments", "bookmarks", "profiles"]');
 
 -- ============================================
 -- 2. USERS TABLE - User accounts

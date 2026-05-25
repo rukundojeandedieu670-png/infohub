@@ -8,6 +8,9 @@
     <meta property="og:description" content="<?php echo htmlspecialchars($og_description ?? 'InfoHub - Rwanda national digital information system'); ?>">
     <meta property="og:image" content="<?php echo htmlspecialchars($og_image ?? APP_URL . '/public/assets/img/og-image.png'); ?>">
     
+    <link rel="icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg">
+
     <title><?php echo htmlspecialchars($page_title ?? 'InfoHub'); ?></title>
     
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/public/assets/css/style.css">

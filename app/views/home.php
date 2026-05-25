@@ -71,7 +71,7 @@ ob_start();
                                     </a>
                                 </h3>
                             </div>
-                            <?php if ($job['featured']): ?>
+                            <?php if ($job['is_featured']): ?>
                                 <span style="background: linear-gradient(135deg, #16a34a, #2563eb); color: white; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600;">⭐ Featured</span>
                             <?php endif; ?>
                         </div>

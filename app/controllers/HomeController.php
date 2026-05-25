@@ -25,7 +25,7 @@ class HomeController extends Controller {
                 SELECT j.*, c.name as category_name
                 FROM jobs j
                 LEFT JOIN categories c ON j.category_id = c.id
-                WHERE j.featured = 1 AND j.status = 'open' AND j.deadline > NOW()
+                WHERE j.is_featured = 1 AND j.status = 'open' AND j.deadline > NOW()
                 ORDER BY j.published_at DESC
                 LIMIT 6
             ");

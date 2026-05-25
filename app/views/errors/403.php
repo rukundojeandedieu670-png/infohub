@@ -23,6 +23,8 @@ $page_title = '403 - Access Denied';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="<?php echo APP_URL; ?>/public/favicons/favicon.svg">
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/public/assets/css/style.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/public/assets/css/errors.css">
