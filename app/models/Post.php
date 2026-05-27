@@ -182,19 +182,23 @@ class Post extends Model {
     /**
      * Get breaking news (most recent featured post)
      */
-    public function getBreakingNews($limit = 1) {
+    public function getBreakingNews($limit = 8) {
         $this->db->prepare("
-            SELECT p.*, u.first_name, u.last_name, c.name as category_name
+            SELECT p.*, u.first_name, u.last_name, c.name as category_name, c.slug as category_slug
             FROM {$this->table} p
             LEFT JOIN users u ON p.author_id = u.id
             LEFT JOIN categories c ON p.category_id = c.id
-            WHERE p.status = 'published' AND p.is_featured = 1
-            ORDER BY p.published_at DESC
+            WHERE p.status = 'published'
+            AND (
+                p.is_featured = 1
+                OR p.published_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            )
+            ORDER BY p.is_featured DESC, p.published_at DESC
             LIMIT ?
         ");
         $this->db->bind('i', $limit);
         $this->db->execute();
-        return $this->db->single();
+        return $this->db->resultSet();
     }
 
     /**

@@ -15,9 +15,11 @@ class NewsController extends Controller {
     public function index($page = 1, $category = null) {
         require_once ROOT_PATH . '/app/models/Post.php';
         require_once ROOT_PATH . '/app/models/Category.php';
+        require_once ROOT_PATH . '/app/models/Scholarship.php';
 
         $postModel = new Post();
         $categoryModel = new Category();
+        $scholarshipModel = new Scholarship();
 
         $limit = 12;
         $offset = ($page - 1) * $limit;
@@ -36,8 +38,11 @@ class NewsController extends Controller {
         // Get all categories
         $categories = $categoryModel->getAll();
 
-        // Get breaking news (most recent and featured)
-        $breakingNews = $postModel->getBreakingNews(1);
+        // Get recent scholarships for the news sidebar
+        $scholarships = $scholarshipModel->getActiveScholarships(4);
+
+        // Get breaking / new news items for the marquee
+        $breakingNews = $postModel->getBreakingNews(8);
 
         $this->view('news/index', [
             'posts' => $posts,
@@ -45,6 +50,7 @@ class NewsController extends Controller {
             'trendingPosts' => $trendingPosts,
             'breakingNews' => $breakingNews,
             'categories' => $categories,
+            'scholarships' => $scholarships,
             'page' => $page,
             'totalPages' => $totalPages,
             'currentCategory' => $category,

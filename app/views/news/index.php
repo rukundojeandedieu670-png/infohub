@@ -30,40 +30,55 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
         body { 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 72px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--gray-light);
             color: var(--gray-dark);
         }
-        main { min-height: calc(100vh - 400px); }
+        main { flex: 1; }
+        footer { margin-top: auto; }
     </style>
 </head>
 <body>
 
     <!-- ===== SECTION 1: TOPBAR ===== -->
-    <div style="background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%); color: white; padding: 0.75rem 1.5rem;">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-weight: 700;">🔴 BREAKING:</span>
-                <span style="font-size: 0.9rem;">
-                    <?php 
-                    if (!empty($breakingNews) && isset($breakingNews[0])) {
-                        echo htmlspecialchars(substr($breakingNews[0]['title'], 0, 60));
-                    } else {
-                        echo 'Latest news and opportunities from Rwanda';
+    <div class="topbar" style="display: flex !important; position: fixed; top: 0; left: 0; right: 0; width: 100%; height: 72px; z-index: 1100; background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);">
+        <div class="topbar-content" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem; width: 100%; min-height: 72px;">
+            <div class="breaking-news" style="flex: 1 1 0%; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
+                <span class="breaking-badge" style="flex-shrink: 0;">BREAKING</span>
+                <?php
+                $tickerItems = [];
+                if (!empty($breakingNews)) {
+                    foreach ($breakingNews as $item) {
+                        $tickerItems[] = htmlspecialchars($item['title']);
                     }
-                    ?>
-                </span>
+                }
+                if (empty($tickerItems)) {
+                    $tickerItems[] = 'Latest news and opportunities from Rwanda';
+                }
+                $tickerText = implode('  •  ', $tickerItems);
+                ?>
+                <div class="breaking-ticker" style="flex: 1 1 0%; min-width: 0; overflow: hidden;">
+                    <div class="ticker-content" style="white-space: nowrap; display: inline-block;">
+                        <?php echo $tickerText; ?>
+                        <span style="padding: 0 1.5rem;">•</span>
+                        <?php echo $tickerText; ?>
+                    </div>
+                </div>
             </div>
-            <div style="display: flex; gap: 1.5rem; font-size: 1.1rem;">
-                <a href="https://facebook.com" target="_blank" style="color: white; text-decoration: none;">📘</a>
-                <a href="https://twitter.com" target="_blank" style="color: white; text-decoration: none;">𝕏</a>
-                <a href="https://linkedin.com" target="_blank" style="color: white; text-decoration: none;">💼</a>
+            <div class="topbar-links" style="display: flex; align-items: center; gap: 1.5rem; white-space: nowrap; flex-shrink: 0;">
+                <a href="https://facebook.com" target="_blank" class="topbar-link">📘</a>
+                <a href="https://twitter.com" target="_blank" class="topbar-link">𝕏</a>
+                <a href="https://linkedin.com" target="_blank" class="topbar-link">💼</a>
             </div>
         </div>
     </div>
 
     <!-- ===== SECTION 2: NAVBAR ===== -->
-    <nav style="position: sticky; top: 0; z-index: 1000; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <nav style="position: sticky; top: 72px; z-index: 1000; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 0;">
         <div style="max-width: 1200px; margin: 0 auto; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
             
             <!-- Logo -->
@@ -86,10 +101,7 @@
             <div style="display: flex; gap: 1.5rem; align-items: center;">
                 <a href="<?php echo APP_URL; ?>/news" style="text-decoration: none; color: var(--gray-dark); font-weight: 600; border-bottom: 3px solid var(--primary-green); padding-bottom: 0.5rem; white-space: nowrap;">📰 News</a>
                 <a href="<?php echo APP_URL; ?>/jobs" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; white-space: nowrap;">💼 Jobs</a>
-                <a href="<?php echo APP_URL; ?>/business" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; white-space: nowrap;">🏢 Business</a>
-            </div>
-
-            <!-- Auth -->
+                    <a href="<?php echo APP_URL; ?>/scholarships" style="text-decoration: none; color: var(--text-secondary); font-weight: 500; white-space: nowrap;">🎓 Scholarships</a>
             <?php if (isset($user) && $user): ?>
                 <div style="display: flex; gap: 1rem; align-items: center; white-space: nowrap;">
                     <span style="color: var(--text-secondary); font-size: 0.9rem;">👤 <?php echo htmlspecialchars(substr($user['first_name'] ?? 'User', 0, 15)); ?></span>
@@ -104,68 +116,102 @@
         </div>
     </nav>
 
-    <!-- ===== SECTION 3: HERO - FEATURED + TRENDING ===== -->
-    <section style="background: linear-gradient(135deg, var(--gray-light) 0%, #e2e8f0 100%); padding: 2rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+    <!-- ===== SECTION 3: HERO - LARGE FEATURED ARTICLE ===== -->
+    <section style="background: white; padding: 1.5rem; margin-bottom: 0;">
         <div style="max-width: 1200px; margin: 0 auto;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-                
-                <!-- LEFT: Featured Article -->
-                <div style="background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
-                    <?php if (!empty($featuredPosts) && isset($featuredPosts[0])): 
-                        $featured = $featuredPosts[0];
-                    ?>
-                        <div style="height: 300px; overflow: hidden; position: relative;">
-                            <?php if (!empty($featured['featured_image'])): ?>
-                                <img src="<?php echo htmlspecialchars($featured['featured_image']); ?>" alt="Featured" 
-                                    style="width: 100%; height: 100%; object-fit: cover;">
-                            <?php else: ?>
-                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent-blue), #60a5fa);"></div>
-                            <?php endif; ?>
-                            <span style="position: absolute; top: 1rem; right: 1rem; background: #dc2626; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; font-size: 0.8rem;">★ FEATURED</span>
-                        </div>
-                        <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column;">
-                            <div style="display: flex; gap: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                <span><?php echo htmlspecialchars($featured['category_name'] ?? 'News'); ?></span>
-                                <span>•</span>
-                                <span><?php echo date('M d, Y', strtotime($featured['published_at'] ?? 'now')); ?></span>
-                            </div>
-                            <h2 style="font-size: 1.4rem; line-height: 1.4; margin-bottom: 1rem; flex: 1;">
-                                <?php echo htmlspecialchars($featured['title']); ?>
-                            </h2>
-                            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
-                                <?php echo htmlspecialchars(substr($featured['excerpt'] ?? $featured['content'], 0, 160)); ?>...
-                            </p>
-                            <a href="<?php echo APP_URL; ?>/news/<?php echo htmlspecialchars($featured['slug']); ?>" 
-                                style="align-self: flex-start; background: var(--primary-green); color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; transition: background 0.3s;">
-                                Read Full Story →
-                            </a>
-                        </div>
+            <?php if (!empty($featuredPosts) && isset($featuredPosts[0])): 
+                $featured = $featuredPosts[0];
+            ?>
+                <!-- Large Featured Hero -->
+                <div style="position: relative; height: 450px; border-radius: 0.75rem; overflow: hidden; margin-bottom: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+                    <?php if (!empty($featured['featured_image'])): ?>
+                        <img src="<?php echo htmlspecialchars($featured['featured_image']); ?>" alt="Featured" 
+                            style="width: 100%; height: 100%; object-fit: cover;">
                     <?php else: ?>
-                        <div style="height: 100%; display: flex; align-items: center; justify-content: center; padding: 3rem;">
-                            <p style="color: var(--text-secondary);">📰 No featured articles available</p>
-                        </div>
+                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent-blue), #60a5fa);"></div>
                     <?php endif; ?>
+                    
+                    <!-- Overlay Gradient -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.7) 100%);"></div>
+                    
+                    <!-- Content Overlay -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem; color: white;">
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <span style="background: #dc2626; padding: 0.4rem 0.8rem; border-radius: 0.25rem; font-weight: 600;">★ FEATURED</span>
+                            <span><?php echo htmlspecialchars($featured['category_name'] ?? 'News'); ?></span>
+                            <span>•</span>
+                            <span><?php echo date('M d, Y', strtotime($featured['published_at'] ?? 'now')); ?></span>
+                        </div>
+                        <h1 style="font-size: 2rem; line-height: 1.3; font-weight: 700; margin-bottom: 1rem;">
+                            <?php echo htmlspecialchars($featured['title']); ?>
+                        </h1>
+                        <p style="font-size: 1rem; line-height: 1.5; margin-bottom: 1.5rem; max-width: 70%;">
+                            <?php echo htmlspecialchars(substr($featured['excerpt'] ?? $featured['content'], 0, 200)); ?>...
+                        </p>
+                        <a href="<?php echo APP_URL; ?>/news/<?php echo htmlspecialchars($featured['slug']); ?>" 
+                            style="display: inline-block; background: var(--primary-green); color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; transition: background 0.3s;">
+                            Read Full Story →
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Trending & Featured Grid Below Hero -->
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                
+                <!-- LEFT: Top Stories -->
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; border-bottom: 3px solid var(--primary-green); padding-bottom: 0.5rem;">📰 Top Stories</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <?php if (!empty($trendingPosts)): ?>
+                            <?php foreach (array_slice($trendingPosts, 0, 4) as $story): ?>
+                                <a href="<?php echo APP_URL; ?>/news/<?php echo htmlspecialchars($story['slug']); ?>" 
+                                    style="background: white; border-radius: 0.5rem; overflow: hidden; text-decoration: none; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                    <div style="height: 150px; overflow: hidden; position: relative;">
+                                        <?php if (!empty($story['featured_image'])): ?>
+                                            <img src="<?php echo htmlspecialchars($story['featured_image']); ?>" 
+                                                alt="<?php echo htmlspecialchars($story['title']); ?>"
+                                                style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;">
+                                        <?php else: ?>
+                                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent-blue), #60a5fa);"></div>
+                                        <?php endif; ?>
+                                        <span style="position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.6); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 600;">
+                                            <?php echo htmlspecialchars(substr($story['category_name'] ?? 'News', 0, 10)); ?>
+                                        </span>
+                                    </div>
+                                    <div style="padding: 1rem;">
+                                        <h4 style="font-size: 0.95rem; line-height: 1.3; font-weight: 700; color: var(--gray-dark); margin-bottom: 0.5rem;">
+                                            <?php echo htmlspecialchars(substr($story['title'], 0, 50)); ?>
+                                        </h4>
+                                        <div style="font-size: 0.75rem; color: #94a3b8;">
+                                            📅 <?php echo date('M d', strtotime($story['published_at'] ?? 'now')); ?>
+                                        </div>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
-                <!-- RIGHT: Trending Now -->
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">🔥 Trending Now</h3>
-                    <?php if (!empty($trendingPosts)): ?>
-                        <?php foreach (array_slice($trendingPosts, 0, 5) as $idx => $trend): ?>
-                            <a href="<?php echo APP_URL; ?>/news/<?php echo htmlspecialchars($trend['slug']); ?>" 
-                                style="display: block; background: white; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--primary-green); text-decoration: none; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                                <div style="display: flex; gap: 0.75rem;">
-                                    <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary-green); min-width: 2rem;"><?php echo $idx + 1; ?></span>
+                <!-- RIGHT: Trending Now (Vertical) -->
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; border-bottom: 3px solid #dc2626; padding-bottom: 0.5rem;">🔥 Trending Now</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <?php if (!empty($trendingPosts)): ?>
+                            <?php foreach (array_slice($trendingPosts, 0, 5) as $idx => $trend): ?>
+                                <a href="<?php echo APP_URL; ?>/news/<?php echo htmlspecialchars($trend['slug']); ?>" 
+                                    style="display: flex; gap: 1rem; background: white; padding: 0.75rem; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #dc2626; min-width: 2rem; text-align: center;"><?php echo $idx + 1; ?></span>
                                     <div style="flex: 1; min-width: 0;">
-                                        <strong style="color: var(--gray-dark); display: block; margin-bottom: 0.25rem; line-height: 1.3; word-break: break-word;">
+                                        <strong style="color: var(--gray-dark); display: block; margin-bottom: 0.35rem; line-height: 1.3; word-break: break-word; font-size: 0.9rem;">
                                             <?php echo htmlspecialchars(substr($trend['title'], 0, 50)); ?>
                                         </strong>
-                                        <span style="font-size: 0.75rem; color: #94a3b8;">👁️ <?php echo number_format($trend['views_count'] ?? 0); ?> views</span>
+                                        <span style="font-size: 0.75rem; color: #94a3b8;">👁️ <?php echo number_format($trend['views_count'] ?? 0); ?></span>
                                     </div>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,8 +233,8 @@
     </div>
 
     <!-- ===== SECTION 5: MAIN CONTENT GRID ===== -->
-    <main style="max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem;">
-        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem;">
+    <main style="flex: 1; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem;">
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem; flex: 1; min-height: 0;">
             
             <!-- LEFT: Articles Grid -->
             <div id="articlesGrid">
@@ -274,12 +320,24 @@
                 <!-- Scholarships Widget -->
                 <div style="background: white; border-radius: 0.75rem; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                     <div style="padding: 1rem; background: linear-gradient(135deg, #f59e0b, #fb923c); color: white; font-weight: 700;">🎓 Scholarships</div>
-                    <div style="padding: 1rem;">
-                        <div style="padding: 0.75rem; margin-bottom: 0.75rem; border-left: 3px solid #f59e0b; background: #fffbeb; border-radius: 0.375rem;">
-                            <strong style="display: block; color: var(--gray-dark); font-size: 0.9rem;">Uganda Scholarship</strong>
-                            <span style="color: #64748b; font-size: 0.8rem;">⏰ Closes in 15 days</span>
-                        </div>
-                        <a href="#" style="color: var(--primary-green); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Browse All →</a>
+                    <div style="padding: 1rem; display: grid; gap: 0.75rem;">
+                        <?php if (!empty($scholarships)): ?>
+                            <?php foreach ($scholarships as $sch): ?>
+                                <div style="padding: 0.75rem; border-left: 3px solid #f59e0b; background: #fffbeb; border-radius: 0.375rem;">
+                                    <strong style="display: block; color: var(--gray-dark); font-size: 0.9rem;"><?php echo htmlspecialchars($sch['title']); ?></strong>
+                                    <span style="color: #64748b; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">🏫 <?php echo htmlspecialchars($sch['organization'] ?: 'InfoHub'); ?></span>
+                                    <div style="display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem; color: #475569;">
+                                        <span>⏰ <?php echo date('M d', strtotime($sch['application_deadline'])); ?></span>
+                                        <span>👁️ <?php echo number_format($sch['views_count'] ?? 0); ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div style="padding: 0.75rem; border-left: 3px solid #f59e0b; background: #fffbeb; border-radius: 0.375rem;">
+                                <p style="color: #64748b; font-size: 0.9rem;">No active scholarships are available right now.</p>
+                            </div>
+                        <?php endif; ?>
+                        <a href="<?php echo APP_URL; ?>/scholarships" style="color: var(--primary-green); text-decoration: none; font-weight: 600; font-size: 0.95rem;">Browse all scholarships →</a>
                     </div>
                 </div>
 
@@ -347,7 +405,7 @@
     <?php endif; ?>
 
     <!-- ===== SECTION 7: FOOTER ===== -->
-    <footer style="background: var(--gray-dark); color: #e2e8f0; margin-top: 4rem; padding: 3rem 1.5rem 1.5rem;">
+    <footer style="position: relative; z-index: 1; background: var(--gray-dark); color: #e2e8f0; margin-top: 4rem; padding: 3rem 1.5rem 1.5rem;">
         <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
             <div>
                 <h4 style="color: white; margin-bottom: 1rem; font-weight: 700;">About InfoHub</h4>
@@ -358,6 +416,7 @@
                 <ul style="list-style: none; line-height: 1.8;">
                     <li><a href="<?php echo APP_URL; ?>/news" style="color: var(--primary-green); text-decoration: none;">📰 News</a></li>
                     <li><a href="<?php echo APP_URL; ?>/jobs" style="color: var(--primary-green); text-decoration: none;">💼 Jobs</a></li>
+                    <li><a href="<?php echo APP_URL; ?>/scholarships" style="color: var(--primary-green); text-decoration: none;">🎓 Scholarships</a></li>
                     <li><a href="<?php echo APP_URL; ?>/business" style="color: var(--primary-green); text-decoration: none;">🏢 Business</a></li>
                 </ul>
             </div>

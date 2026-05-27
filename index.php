@@ -78,6 +78,10 @@ $router->route('jobs/{slug}', 'JobsController@show', 'GET');
 $router->route('jobs/{id}/apply', 'JobsController@applyForm', 'GET');
 $router->route('jobs/apply', 'JobsController@apply', 'POST');
 
+// SCHOLARSHIPS ROUTES
+$router->route('scholarships', 'ScholarshipsController@index', 'GET');
+$router->route('scholarships/{slug}', 'ScholarshipsController@show', 'GET');
+
 // Employer routes
 $router->route('employer/jobs', 'EmployerController@jobs', 'GET');
 $router->route('employer/jobs/create', 'EmployerController@createJob', 'GET');

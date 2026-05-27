@@ -118,15 +118,23 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    min-height: 100%;
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     font-family: var(--font-family-sans);
     background-color: var(--bg-secondary);
     color: var(--text-primary);
     line-height: var(--leading-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+    flex: 1;
 }
 
 /* ==============================================
@@ -195,12 +203,12 @@ a:hover {
    ============================================== */
 
 .topbar {
-    background: linear-gradient(90deg, var(--text-primary) 0%, var(--gray-800) 100%);
+    background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
     color: white;
     padding: var(--spacing-sm) 0;
     position: relative;
     overflow: hidden;
-    border-bottom: 2px solid var(--primary-green);
+    border-bottom: 2px solid #b91c1c;
 }
 
 .topbar-content {
@@ -219,6 +227,12 @@ a:hover {
     gap: var(--spacing-md);
     flex: 1;
     min-width: 0;
+}
+
+.breaking-ticker {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .breaking-badge {
