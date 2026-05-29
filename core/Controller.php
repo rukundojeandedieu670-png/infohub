@@ -8,6 +8,7 @@ class Controller {
     protected $db;
     protected $user = null;
     protected $isAdmin = false;
+    protected $isSuperAdmin = false;
     protected $currentRole = null;
 
     public function __construct() {
@@ -34,8 +35,10 @@ class Controller {
                 require_once ROOT_PATH . '/app/models/Role.php';
                 $roleModel = new Role();
                 $this->isAdmin = $roleModel->canActAs($currentRole['id'], 'Admin');
+                $this->isSuperAdmin = $roleModel->canActAs($currentRole['id'], 'Super Admin');
             } else {
                 $this->isAdmin = in_array($this->user['role'], ['Super Admin', 'Admin', 'Editor']);
+                $this->isSuperAdmin = $this->user['role'] === 'Super Admin';
             }
         }
     }
@@ -70,6 +73,8 @@ class Controller {
      * Load view
      */
     protected function view($view, $data = []) {
+        $data['user'] = $this->user;
+        $data['flash'] = $this->getFlash();
         extract($data);
         require_once __DIR__ . '/../app/views/' . $view . '.php';
     }
@@ -108,6 +113,10 @@ class Controller {
     protected function requireAdmin() {
         $this->requireLogin();
 
+        if ($this->isSuperAdmin) {
+            return;
+        }
+
         require_once ROOT_PATH . '/app/models/Role.php';
         $roleModel = new Role();
         $currentRole = $this->getCurrentRoleRecord();
@@ -124,6 +133,10 @@ class Controller {
      */
     protected function requireRole($role) {
         $this->requireLogin();
+
+        if ($this->isSuperAdmin) {
+            return;
+        }
 
         require_once ROOT_PATH . '/app/models/Role.php';
         $roleModel = new Role();
@@ -243,6 +256,10 @@ class Controller {
             return false;
         }
 
+        if ($this->isSuperAdmin) {
+            return true;
+        }
+
         $roleRecord = $this->getCurrentRoleRecord();
 
         if ($roleRecord) {
@@ -352,6 +369,10 @@ class Controller {
      */
     protected function requirePermission($action) {
         $this->requireLogin();
+
+        if ($this->isSuperAdmin) {
+            return;
+        }
         
         if (!$this->hasPermission($action)) {
             Logger::logError('Permission Denied', 'User ' . $this->user['id'] . ' attempted unauthorized action: ' . $action);

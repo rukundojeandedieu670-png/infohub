@@ -105,7 +105,7 @@ class Post extends Model {
             'category_id' => $data['category_id'] ?? null,
             'author_id' => $data['author_id'],
             'status' => $data['status'] ?? 'draft',
-            'featured' => $data['featured'] ?? false,
+            'is_featured' => $data['is_featured'] ?? false,
             'published_at' => $data['published_at'] ?? null
         ]);
     }
@@ -115,7 +115,7 @@ class Post extends Model {
      */
     public function getAllWithAuthor($limit = 10, $offset = 0) {
         $this->db->prepare("
-            SELECT p.*, u.name as author_name, c.name as category_name
+            SELECT p.*, p.is_featured as featured, CONCAT(u.first_name, ' ', u.last_name) as author_name, c.name as category_name
             FROM {$this->table} p
             LEFT JOIN users u ON p.author_id = u.id
             LEFT JOIN categories c ON p.category_id = c.id
@@ -143,7 +143,7 @@ class Post extends Model {
      * Count featured posts
      */
     public function countFeatured() {
-        $this->db->prepare("SELECT COUNT(*) as count FROM {$this->table} WHERE featured = 1");
+        $this->db->prepare("SELECT COUNT(*) as count FROM {$this->table} WHERE is_featured = 1");
         $this->db->execute();
         $result = $this->db->single();
         return $result['count'] ?? 0;

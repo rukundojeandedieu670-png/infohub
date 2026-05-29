@@ -139,7 +139,7 @@ include ROOT_PATH . '/app/views/layouts/admin.php';
                                 <?php echo date('M j, Y', strtotime($post['published_at'])); ?>
                             </td>
                             <td style="padding: 15px; text-align: center;">
-                                <?php if ($post['featured']): ?>
+                                <?php if (($post['is_featured'] ?? false) || ($post['featured'] ?? false)): ?>
                                     <span style="color: #f59e0b; font-weight: 600;">⭐ Featured</span>
                                 <?php else: ?>
                                     <span style="color: #d1d5db;">☆</span>

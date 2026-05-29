@@ -11,12 +11,18 @@
 </head>
 <body>
     <!-- Admin Navbar -->
+    <?php $isSuperAdmin = ($user['role'] ?? '') === 'Super Admin'; ?>
     <div class="admin-navbar">
-        <h1 style="margin: 0; font-size: 1.25rem;">
-            🔐 InfoHub Admin
-        </h1>
-        <div style="display: flex; align-items: center; gap: 2rem;">
-            <span><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+        <div>
+            <h1 style="margin: 0; font-size: 1.25rem;">
+                🔐 InfoHub Admin
+            </h1>
+            <div style="font-size: 0.95rem; color: #f4f4f4; margin-top: 0.35rem;">
+                Role: <?php echo htmlspecialchars($user['role'] ?? 'Admin'); ?>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span><?php echo htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: 'Admin'); ?></span>
             <a href="<?php echo APP_URL; ?>/auth/logout">Logout</a>
         </div>
     </div>
@@ -27,18 +33,25 @@
             <a href="<?php echo APP_URL; ?>/admin/dashboard" class="admin-sidebar-item">
                 Dashboard
             </a>
-            <a href="<?php echo APP_URL; ?>/admin/users" class="admin-sidebar-item">
-                Users
-            </a>
-            <a href="<?php echo APP_URL; ?>/admin/news" class="admin-sidebar-item">
+            <?php if ($isSuperAdmin): ?>
+                <a href="<?php echo APP_URL; ?>/admin/users" class="admin-sidebar-item">
+                    Users
+                </a>
+            <?php endif; ?>
+            <a href="<?php echo APP_URL; ?>/admin/posts" class="admin-sidebar-item">
                 News & Posts
+            </a>
+            <a href="<?php echo APP_URL; ?>/admin/payments" class="admin-sidebar-item">
+                Payments
             </a>
             <a href="<?php echo APP_URL; ?>/admin/businesses" class="admin-sidebar-item">
                 Businesses
             </a>
-            <a href="<?php echo APP_URL; ?>/admin/logs" class="admin-sidebar-item">
-                System Logs
-            </a>
+            <?php if ($isSuperAdmin): ?>
+                <a href="<?php echo APP_URL; ?>/admin/logs" class="admin-sidebar-item">
+                    System Logs
+                </a>
+            <?php endif; ?>
             <a href="<?php echo APP_URL; ?>" class="admin-sidebar-item" style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 2rem;">
                 ← Back to Site
             </a>

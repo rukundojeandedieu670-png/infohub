@@ -107,7 +107,10 @@ $router->route('business-owner/profile/update', 'BusinessOwnerController@updateP
 $router->route('admin', 'Admin/DashboardController@index', 'GET');
 $router->route('admin/dashboard', 'Admin/DashboardController@index', 'GET');
 $router->route('admin/users', 'Admin/UsersController@index', 'GET');
+$router->route('admin/users/create', 'Admin/UsersController@create', 'GET');
+$router->route('admin/users/store', 'Admin/UsersController@store', 'POST');
 $router->route('admin/users/{id}', 'Admin/UsersController@show', 'GET');
+$router->route('admin/users/{id}/reveal-hash', 'Admin/UsersController@revealHash', 'POST');
 $router->route('admin/users/{id}/edit', 'Admin/UsersController@edit', 'POST');
 $router->route('admin/users/{id}/delete', 'Admin/UsersController@delete', 'POST');
 $router->route('admin/logs', 'Admin/LogsController@index', 'GET');
@@ -116,6 +119,7 @@ $router->route('admin/logs/auth', 'Admin/LogsController@auth', 'GET');
 $router->route('admin/logs/errors', 'Admin/LogsController@errors', 'GET');
 $router->route('admin/businesses', 'Admin/BusinessController@index', 'GET');
 $router->route('admin/businesses/{id}/verify', 'Admin/BusinessController@verify', 'POST');
+$router->route('admin/payments', 'Admin/PaymentsController@index', 'GET');
 
 // =====================================================
 // SEO ROUTES

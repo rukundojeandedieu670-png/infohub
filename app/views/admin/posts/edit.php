@@ -189,7 +189,7 @@ include ROOT_PATH . '/app/views/layouts/admin.php';
                         type="checkbox" 
                         name="featured" 
                         value="1"
-                        <?php echo (isset($post) && $post['featured']) ? 'checked' : ''; ?>
+                        <?php echo (isset($post) && (($post['is_featured'] ?? false) || ($post['featured'] ?? false))) ? 'checked' : ''; ?>
                     >
                     <span style="color: #6b7280;">Show on homepage</span>
                 </label>

@@ -14,9 +14,9 @@ class AuthController extends Controller {
      * Show login form
      */
     public function login() {
-        // If already logged in, redirect to home
+        // If already logged in, redirect to the role dashboard or home
         if ($this->user) {
-            header('Location: ' . APP_URL);
+            header('Location: ' . $this->getRoleHomeUrl($this->user['role']));
             exit;
         }
         
@@ -103,7 +103,7 @@ class AuthController extends Controller {
             }
         }
 
-        $this->redirect(APP_URL);
+        $this->redirect($this->getRoleHomeUrl($user['role_name'] ?? null));
     }
 
     /**
@@ -253,6 +253,29 @@ class AuthController extends Controller {
         $this->view('auth/forgot-password', [
             'csrf_token' => $this->generateCSRFToken()
         ]);
+    }
+
+    /**
+     * Return the landing URL for a role after login.
+     */
+    protected function getRoleHomeUrl($roleName) {
+        if (empty($roleName) || !is_string($roleName)) {
+            return APP_URL;
+        }
+
+        $roleName = trim($roleName);
+
+        $map = [
+            'Super Admin' => APP_URL . '/admin/dashboard',
+            'Admin' => APP_URL . '/admin/dashboard',
+            'Editor' => APP_URL . '/news',
+            'Writer' => APP_URL . '/news',
+            'Business Owner' => APP_URL . '/business-owner/dashboard',
+            'Employer' => APP_URL . '/employer/jobs',
+            'Registered User' => APP_URL . '/profile'
+        ];
+
+        return $map[$roleName] ?? APP_URL;
     }
 
     /**

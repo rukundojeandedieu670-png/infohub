@@ -19,15 +19,22 @@ class Role extends Model {
     }
 
     /**
-     * Resolve the current role's assigned permissions.
+     * Resolve the current role's assigned permissions, including inherited permissions.
      */
     public function getEffectivePermissions($roleIdentifier) {
-        $role = $this->findRole($roleIdentifier);
-        if (!$role) {
-            return [];
+        $hierarchy = $this->getRoleHierarchy($roleIdentifier);
+        $permissions = [];
+
+        foreach ($hierarchy as $role) {
+            $rolePermissions = $this->parsePermissions($role['permissions'] ?? null);
+            foreach ($rolePermissions as $permission) {
+                if (!in_array($permission, $permissions, true)) {
+                    $permissions[] = $permission;
+                }
+            }
         }
 
-        return $this->parsePermissions($role['permissions'] ?? null);
+        return $permissions;
     }
 
     /**

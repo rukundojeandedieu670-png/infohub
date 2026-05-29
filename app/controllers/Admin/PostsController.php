@@ -118,7 +118,7 @@ class PostsController extends Controller {
             'category_id' => $category_id > 0 ? $category_id : null,
             'author_id' => $_SESSION['user_id'],
             'featured_image' => $featured_image,
-            'featured' => $featured,
+            'is_featured' => $featured,
             'status' => $status,
             'published_at' => $status === 'published' ? date('Y-m-d H:i:s') : null
         ];
@@ -231,7 +231,7 @@ class PostsController extends Controller {
             'content' => $content,
             'category_id' => $category_id > 0 ? $category_id : null,
             'featured_image' => $featured_image,
-            'featured' => $featured,
+            'is_featured' => $featured,
             'status' => $status
         ];
         

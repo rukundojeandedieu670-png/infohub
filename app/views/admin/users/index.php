@@ -4,7 +4,10 @@ extract($__data ?? []);
 ob_start();
 ?>
 
-<h2 style="margin-bottom: 2rem;">Users Management</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2 style="margin: 0;">Users Management</h2>
+    <a href="<?php echo APP_URL; ?>/admin/users/create" class="btn btn-primary" style="padding: 0.75rem 1rem;">Create New User</a>
+</div>
 
 <div class="card">
     <table class="admin-table">
